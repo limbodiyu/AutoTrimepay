@@ -13,7 +13,7 @@ import (
 
 var email = "!!!change to your email!!!"
 var password = "!!!change to your password!!!"
-var method = "1" //1:支付宝 2:微信
+var method = "1" //1:alipay  2:wechat
 
 func main() {
 	urlHome := "https://api.trimepay.com/"
