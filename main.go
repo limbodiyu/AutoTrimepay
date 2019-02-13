@@ -13,6 +13,7 @@ import (
 
 var email = "!!!change to your email!!!"
 var password = "!!!change to your password!!!"
+var method = "1" //1:支付宝 2:微信
 
 func main() {
 	urlHome := "https://api.trimepay.com/"
@@ -54,7 +55,7 @@ func main() {
 		return
 	}
 	requestBody = url.Values{}
-	requestBody.Set("withdrawMethod", "1")
+	requestBody.Set("withdrawMethod", method)
 	requestBody.Set("totalFee", strconv.FormatFloat(balance, 'f', 0, 64))
 	request, _ = http.NewRequest(
 		"POST",
