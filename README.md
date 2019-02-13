@@ -9,7 +9,7 @@ CentOS:
 yum install go -y
 
 Debian/Ubuntu:
-apt-get install golang
+apt-get install golang -y
 ```
 
 下载源代码
