@@ -21,6 +21,7 @@ curl -O https://raw.githubusercontent.com/CGDF-Github/AutoTrimepay/master/main.g
 ```
 var email = "!!!change to your email!!!"
 var password = "!!!change to your password!!!"
+var method = "1" //1 : alipay  2 : wechat
 ```
 
 使用`crontab -e`添加定时提现任务
