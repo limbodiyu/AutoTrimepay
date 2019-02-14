@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -19,6 +20,7 @@ func main() {
 	urlHome := "https://api.trimepay.com/"
 	client := &http.Client{}
 	rand.Seed(time.Now().UnixNano())
+	addLog(time.Now().String(), false)
 
 	letterRunes := []rune(`abcdefghijklmnopqrstuvwxyz`)
 	csrf := make([]rune, 32)
@@ -35,7 +37,19 @@ func main() {
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	response, _ := client.Do(request)
 	cookies := response.Cookies()
-	defer response.Body.Close()
+	responseBody, _ := ioutil.ReadAll(response.Body)
+	var responseBodyMap map[string]interface{}
+	errorLog := json.Unmarshal(responseBody, &responseBodyMap)
+	if errorLog != nil {
+		addLog(errorLog.Error(), true)
+	}
+	if responseBodyMap["code"].(float64) != 200 {
+		addLog("Login fail", true)
+	}
+	errorLog = response.Body.Close()
+	if errorLog != nil {
+		addLog(errorLog.Error(), true)
+	}
 
 	request, _ = http.NewRequest(
 		"GET",
@@ -45,14 +59,21 @@ func main() {
 		request.AddCookie(cookieIndex)
 	}
 	response, _ = client.Do(request)
-	responseBody, _ := ioutil.ReadAll(response.Body)
-	var responseBodyMap map[string]interface{}
-	json.Unmarshal(responseBody, &responseBodyMap)
+	responseBody, _ = ioutil.ReadAll(response.Body)
+
+	errorLog = json.Unmarshal(responseBody, &responseBodyMap)
+	if errorLog != nil {
+		addLog(errorLog.Error(), true)
+	}
+
 	balance := responseBodyMap["data"].(map[string]interface{})["merchant"].(map[string]interface{})["balance"].(float64)
-	defer response.Body.Close()
+	errorLog = response.Body.Close()
+	if errorLog != nil {
+		addLog(errorLog.Error(), true)
+	}
 
 	if balance <= 0 {
-		return
+		addLog("No Balance", true)
 	}
 	requestBody = url.Values{}
 	requestBody.Set("withdrawMethod", method)
@@ -65,6 +86,24 @@ func main() {
 	for _, cookieIndex := range cookies {
 		request.AddCookie(cookieIndex)
 	}
-	response, _ = client.Do(request)
-	defer response.Body.Close()
+	response, errorLog = client.Do(request)
+	if errorLog != nil {
+		addLog(errorLog.Error(), true)
+	}
+
+	addLog("", true)
+}
+
+var allLog = ""
+
+func addLog(log string, exit bool) {
+	allLog += log
+	allLog += "\n"
+
+	if exit {
+		allLog += "\n"
+		logFile, _ := os.OpenFile("AutoTrimepay.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModeAppend)
+		logFile.WriteString(allLog)
+		os.Exit(0)
+	}
 }
