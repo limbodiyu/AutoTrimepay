@@ -14,7 +14,7 @@ apt-get install golang -y
 
 下载源代码
 ```
-curl -O https://raw.githubusercontent.com/CGDF-Github/AutoTrimepay/master/main.go
+curl -O https://raw.githubusercontent.com/CGDF-Github/AutoTrimepay/master/AutoTrimepay.go
 ```
 
 自行修改源代码中的以下内容
@@ -29,5 +29,5 @@ var method = "1" //1 : alipay  2 : wechat
 
 例：每天9点52提现：
 ```
-52 9 * * * go run 刚刚下载的文件路径/main.go
+52 9 * * * go run 刚刚下载的文件路径/AutoTrimepay.go
 ```
